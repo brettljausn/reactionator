@@ -8,6 +8,7 @@ library(rsconnect)
 library(DT)
 library(data.table)
 library(rhandsontable)
+library(rlang)
 
 source("./scripts/generate_equations.R")
 
