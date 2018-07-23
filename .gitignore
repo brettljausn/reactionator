@@ -2,4 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
-/gui/rsconnect/*
+/rsconnect/*
+/rsconnect
+rsconnect

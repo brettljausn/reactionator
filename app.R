@@ -7,8 +7,9 @@ library(shinydashboard)
 library(rsconnect)
 library(DT)
 library(data.table)
+library(rhandsontable)
 
-source("~/reactionator/scripts/generate_equations.R")
+source("./scripts/generate_equations.R")
 
 ui <- dashboardPage(
   dashboardHeader(title = "REACTIONATOR",tags$li(class = "dropdown",
