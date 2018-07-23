@@ -11,8 +11,12 @@ library(DT)
 library(data.table)
 library(rhandsontable)
 library(rlang)
+library(ggplot2)
+library(reshape2)
 
 source("./scripts/generate_equations.R")
+source("./scripts/calculate_concentration_profile.R")
+
 
 ui <- dashboardPage(
   dashboardHeader(title = "REACTIONATOR",tags$li(class = "dropdown",
@@ -79,6 +83,27 @@ ui <- dashboardPage(
                 solidHeader = TRUE,
                 status = "primary",
                 rHandsontableOutput("reaction_rates")
+              ),
+              box(
+                title = "Time",
+                solidHeader = TRUE,
+                status = "primary",
+                numericInput(
+                  "endtime",
+                  "Time",
+                  10
+                ),
+                numericInput(
+                  "stepsize",
+                  "stepsize:",
+                  0.1
+                )
+              ),
+              box(
+                title = "result",
+                solidHeader = TRUE,
+                status = "primary",
+                plotOutput("result_plot")
               )
             ))
   ))
@@ -124,6 +149,8 @@ server <- function(input, output) {
     equations <- generate_equations(hot_to_r(input$species_list))
     HTML(paste(equations, collapse = '<br/>'))
   })
+  
+  output$result_plot<-renderPlot({calc_concentrations(hot_to_r(input$concentrations),hot_to_r(input$reaction_rates),hot_to_r(input$species_list),input$endtime, input$stepsize)})
   
   
   

@@ -4,7 +4,9 @@ packages <-
     "rlang",
     "DT",
     "data.table",
-    "rhandsontable")
+    "rhandsontable",
+    "ggplot2",
+    "reshape2")
 
 for (i in packages) {
   if (require(as.name(i), character.only = T)) {
