@@ -1,6 +1,8 @@
 ## app.R ##
 rm(list = ls())
 
+source("./scripts/install_packages.R")
+
 
 library(shiny)
 library(shinydashboard)
