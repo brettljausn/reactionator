@@ -2,18 +2,18 @@
 rm(list = ls())
 
 # comment the following source command when deploying
-source("./scripts/install_packages.R")
+# source("./scripts/install_packages.R")
 
 # comment the library commands when launching locally
-# library(shiny)
-# library(shinydashboard)
-# library(rsconnect)
-# library(DT)
-# library(data.table)
-# library(rhandsontable)
-# library(rlang)
-# library(ggplot2)
-# library(reshape2)
+library(shiny)
+library(shinydashboard)
+library(rsconnect)
+library(DT)
+library(data.table)
+library(rhandsontable)
+library(rlang)
+library(ggplot2)
+library(reshape2)
 
 source("./scripts/generate_equations.R")
 source("./scripts/calculate_concentration_profile.R")
@@ -22,7 +22,7 @@ source("./scripts/calculate_concentration_profile.R")
 ui <- dashboardPage(
   dashboardHeader(title = "REACTIONATOR", tags$li(
     class = "dropdown",
-    tags$a("v0.4.0", href = "https://github.com/brettljausn/reactionator/")
+    tags$a("v0.4.1", href = "https://github.com/brettljausn/reactionator/")
   )),
   dashboardSidebar(sidebarMenu(
     menuItem("Simulation",
@@ -137,7 +137,9 @@ server <- function(input, output) {
     rhandsontable(stoic_matrix, rowHeaders = NULL) %>% hot_col("reaction", readOnly = TRUE)
   })
   
+  # generate concentrations table
   output$concentrations <- renderRHandsontable({
+    req(input$species_list)
     concentrations <-
       data.table(species = paste0("c(", colnames(hot_to_r(
         input$species_list
@@ -148,21 +150,26 @@ server <- function(input, output) {
                   colHeaders = NULL)
   })
   
+  # generate reaction rates table
   output$reaction_rates <- renderRHandsontable({
+    req(input$number_reactions)
     rates <-
       data.table(reaction = paste0("k", 1:input$number_reactions))
     rates$k <- 0
     rhandsontable(rates, rowHeaders = NULL, colHeaders = NULL)
   })
   
-  
+  # parse stoichiometric matrix into equations
   output$chem_equations <- renderUI({
+    req(input$species_list)
     equations <- generate_equations(hot_to_r(input$species_list))
     HTML(paste(equations, collapse = '<br/>'))
   })
   
+  # calculate and plot data
   output$result_plot <-
     renderPlot({
+      req(input$reaction_rates, input$concentrations, input$reaction_rates, input$endtime, input$stepsize)
       calc_concentrations(
         hot_to_r(input$concentrations),
         hot_to_r(input$reaction_rates),
