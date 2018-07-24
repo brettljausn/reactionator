@@ -48,5 +48,5 @@ p <- ggplot(data = result, aes(x = t, y = value, color = variable)) +
   geom_line() +
   ylab("c")
 
-return(p)
+return(list(p,concentrations))
 }

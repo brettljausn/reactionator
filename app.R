@@ -19,8 +19,10 @@ source("./scripts/calculate_concentration_profile.R")
 
 
 ui <- dashboardPage(
-  dashboardHeader(title = "REACTIONATOR",tags$li(class = "dropdown",
-                                                 tags$a("v0.2.0", href = "https://github.com/brettljausn/reactionator/"))),
+  dashboardHeader(title = "REACTIONATOR", tags$li(
+    class = "dropdown",
+    tags$a("v0.2.0", href = "https://github.com/brettljausn/reactionator/")
+  )),
   dashboardSidebar(sidebarMenu(
     menuItem("Simulation",
              tabName = "simulation",
@@ -88,22 +90,24 @@ ui <- dashboardPage(
                 title = "Time",
                 solidHeader = TRUE,
                 status = "primary",
-                numericInput(
-                  "endtime",
-                  "Time",
-                  10
-                ),
-                numericInput(
-                  "stepsize",
-                  "stepsize:",
-                  0.1
-                )
+                numericInput("endtime",
+                             "Time",
+                             10),
+                numericInput("stepsize",
+                             "stepsize:",
+                             0.1)
               ),
               box(
                 title = "result",
                 solidHeader = TRUE,
                 status = "primary",
                 plotOutput("result_plot")
+              ),
+              box(
+                title = "download",
+                solidHeader = TRUE,
+                status = "primary",
+                downloadButton("download_data")
               )
             ))
   ))
@@ -128,18 +132,24 @@ server <- function(input, output) {
   output$species_list <- renderRHandsontable({
     stoic_matrix <- data.table(reaction = 1:input$number_reactions)
     stoic_matrix[, as.character(LETTERS[1:input$number_species])] <-
-      as.integer(0)
+      as.numeric(0)
     rhandsontable(stoic_matrix, rowHeaders = NULL) %>% hot_col("reaction", readOnly = TRUE)
   })
   
   output$concentrations <- renderRHandsontable({
-    concentrations <- data.table(species = paste0("c(",colnames(hot_to_r(input$species_list))[2:NCOL(hot_to_r(input$species_list))],")"))
+    concentrations <-
+      data.table(species = paste0("c(", colnames(hot_to_r(
+        input$species_list
+      ))[2:NCOL(hot_to_r(input$species_list))], ")"))
     concentrations$c <- 0
-    rhandsontable(concentrations, rowHeaders = NULL, colHeaders = NULL)
+    rhandsontable(concentrations,
+                  rowHeaders = NULL,
+                  colHeaders = NULL)
   })
   
   output$reaction_rates <- renderRHandsontable({
-    rates <- data.table(reaction = paste0("k", 1:input$number_reactions))
+    rates <-
+      data.table(reaction = paste0("k", 1:input$number_reactions))
     rates$k <- 0
     rhandsontable(rates, rowHeaders = NULL, colHeaders = NULL)
   })
@@ -150,10 +160,34 @@ server <- function(input, output) {
     HTML(paste(equations, collapse = '<br/>'))
   })
   
-  output$result_plot<-renderPlot({calc_concentrations(hot_to_r(input$concentrations),hot_to_r(input$reaction_rates),hot_to_r(input$species_list),input$endtime, input$stepsize)})
+  output$result_plot <-
+    renderPlot({
+      calc_concentrations(
+        hot_to_r(input$concentrations),
+        hot_to_r(input$reaction_rates),
+        hot_to_r(input$species_list),
+        input$endtime,
+        input$stepsize
+      )[[1]]
+    })
   
-  
-  
+  output$download_data <- downloadHandler(
+    filename = function() {
+      paste("data_", Sys.Date(), ".csv", sep = "")
+    },
+    content = function(file) {
+      write.csv2(
+        calc_concentrations(
+          hot_to_r(input$concentrations),
+          hot_to_r(input$reaction_rates),
+          hot_to_r(input$species_list),
+          input$endtime,
+          input$stepsize
+        )[[2]],
+        file
+      )
+    }
+  )
   
   
   
