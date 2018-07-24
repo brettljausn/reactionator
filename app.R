@@ -21,7 +21,7 @@ source("./scripts/calculate_concentration_profile.R")
 ui <- dashboardPage(
   dashboardHeader(title = "REACTIONATOR", tags$li(
     class = "dropdown",
-    tags$a("v0.2.0", href = "https://github.com/brettljausn/reactionator/")
+    tags$a("v0.3.0", href = "https://github.com/brettljausn/reactionator/")
   )),
   dashboardSidebar(sidebarMenu(
     menuItem("Simulation",
