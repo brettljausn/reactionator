@@ -1,18 +1,19 @@
 ## app.R ##
 rm(list = ls())
 
+# comment the following source command when deploying
 source("./scripts/install_packages.R")
 
-
-library(shiny)
-library(shinydashboard)
-library(rsconnect)
-library(DT)
-library(data.table)
-library(rhandsontable)
-library(rlang)
-library(ggplot2)
-library(reshape2)
+# comment the library commands when launching locally
+# library(shiny)
+# library(shinydashboard)
+# library(rsconnect)
+# library(DT)
+# library(data.table)
+# library(rhandsontable)
+# library(rlang)
+# library(ggplot2)
+# library(reshape2)
 
 source("./scripts/generate_equations.R")
 source("./scripts/calculate_concentration_profile.R")
@@ -21,7 +22,7 @@ source("./scripts/calculate_concentration_profile.R")
 ui <- dashboardPage(
   dashboardHeader(title = "REACTIONATOR", tags$li(
     class = "dropdown",
-    tags$a("v0.3.0", href = "https://github.com/brettljausn/reactionator/")
+    tags$a("v0.4.0", href = "https://github.com/brettljausn/reactionator/")
   )),
   dashboardSidebar(sidebarMenu(
     menuItem("Simulation",
