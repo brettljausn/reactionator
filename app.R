@@ -27,7 +27,12 @@ ui <- dashboardPage(
   dashboardSidebar(sidebarMenu(
     menuItem("Simulation",
              tabName = "simulation",
-             icon = icon("tint")),
+             icon = icon("flask")),
+    menuItem(
+      "Thermodynamic data",
+      tabName = "thermo",
+      icon = icon("calculator")
+    ),
     menuItem(
       "Contact/Feedback",
       tabName = "contact",
