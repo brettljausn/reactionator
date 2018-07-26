@@ -52,63 +52,67 @@ ui <- dashboardPage(
             )),
     tabItem(tabName = "simulation",
             fluidRow(
-              box(
-                title = "Stoichiometric matrix",
-                solidHeader = TRUE,
-                status = "primary",
-                splitLayout(
-                  numericInput(
-                    "number_species",
-                    "Number of species:",
-                    3,
-                    min = 1,
-                    max = 24
+              column(
+                width = 4,
+                box(
+                  title = "Stoichiometric matrix",
+                  width = NULL,
+                  solidHeader = TRUE,
+                  status = "primary",
+                  splitLayout(
+                    numericInput(
+                      "number_species",
+                      "Number of species:",
+                      3,
+                      min = 1,
+                      max = 24
+                    ),
+                    numericInput(
+                      "number_reactions",
+                      "Number of reactions:",
+                      2,
+                      min = 1,
+                      max = 10
+                    )
                   ),
-                  numericInput(
-                    "number_reactions",
-                    "Number of reactions:",
-                    2,
-                    min = 1,
-                    max = 10
-                  )
+                  rHandsontableOutput("species_list"),
+                  htmlOutput("chem_equations")
                 ),
-                rHandsontableOutput("species_list"),
-                htmlOutput("chem_equations")
-              ),
-              box(
-                title = "Concentrations",
-                solidHeader = TRUE,
-                status = "primary",
-                rHandsontableOutput("concentrations")
-              ),
-              box(
-                title = "Reaction rate constants",
-                solidHeader = TRUE,
-                status = "primary",
-                rHandsontableOutput("reaction_rates")
-              ),
-              box(
-                title = "Time",
-                solidHeader = TRUE,
-                status = "primary",
-                numericInput("endtime",
-                             "Time",
-                             10),
-                numericInput("stepsize",
-                             "stepsize:",
-                             0.1)
-              ),
-              box(
-                title = "result",
-                solidHeader = TRUE,
-                status = "primary",
-                plotOutput("result_plot")
-              ),
-              box(
-                title = "download",
-                solidHeader = TRUE,
-                status = "primary",
-                downloadButton("download_data")
+                box(
+                  title = "Concentrations",
+                  solidHeader = TRUE,
+                  status = "primary",
+                  rHandsontableOutput("concentrations")
+                ),
+                box(
+                  title = "Reaction rate constants",
+                  solidHeader = TRUE,
+                  status = "primary",
+                  rHandsontableOutput("reaction_rates")
+                ),
+                box(
+                  title = "Time",
+                  solidHeader = TRUE,
+                  status = "primary",
+                  splitLayout(
+                    numericInput("endtime",
+                                 "Time",
+                                 10),
+                    numericInput("stepsize",
+                                 "stepsize:",
+                                 0.1)
+                  )
+                )
+              ), column(
+                width = 8,
+                box(
+                  title = "Results",
+                  solidHeader = TRUE,
+                  width = NULL,
+                  status = "primary",
+                  plotOutput("result_plot"),
+                  downloadButton("download_data", label = "Download data (.csv)")
+                )
               )
             ))
   ))
@@ -169,7 +173,13 @@ server <- function(input, output) {
   # calculate and plot data
   output$result_plot <-
     renderPlot({
-      req(input$reaction_rates, input$concentrations, input$reaction_rates, input$endtime, input$stepsize)
+      req(
+        input$reaction_rates,
+        input$concentrations,
+        input$reaction_rates,
+        input$endtime,
+        input$stepsize
+      )
       calc_concentrations(
         hot_to_r(input$concentrations),
         hot_to_r(input$reaction_rates),
