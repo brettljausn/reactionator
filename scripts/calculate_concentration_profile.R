@@ -1,13 +1,12 @@
+# data for testing
 concentrations <- data.table(species = c("c(A)","c(B)","c(C)"),
                              c = c(3,2,0))
 rates <- data.table(reaction = c("k1", "k2"),
                     k = c(0.01,0.1))
-
 stoich_matrix <- data.table(reaction = c(1,2),
                             A = c(-2,2),
                             B = c(-1,1),
                             C = c(2,-2))
-
 endtime = 1
 stepsize = 0.1
 
@@ -43,10 +42,16 @@ for (i in 2:length(time)){
 }
 
 result <- melt(concentrations, id.vars = "t")
+result$variable <- sub("\\.", "(", result$variable)
+result$variable <- sub("\\.", ")", result$variable)
+
 
 p <- ggplot(data = result, aes(x = t, y = value, color = variable)) +
   geom_line() +
-  ylab("c")
+  ylab(bquote('c / mol L'^-1)) +
+  xlab("t / s") +
+  labs(color = "") +
+  theme_bw()
 
 return(list(p,concentrations))
 }
