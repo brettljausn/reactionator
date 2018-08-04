@@ -18,11 +18,24 @@ library(reshape2)
 source("./scripts/generate_equations.R")
 source("./scripts/calculate_concentration_profile.R")
 
+stoic_matrix <<- data.frame(reaction = 1:2)
+stoic_matrix[, as.character(LETTERS[1:3])] <- c(-2,2,-1,1,2,-2)
+stoic_matrix <<- stoic_matrix
+
+concentrations <<-
+  data.table(species = paste0("c(", colnames(stoic_matrix)[2:NCOL(stoic_matrix)], ")"))
+concentrations$c <- c(2,1,0.5)
+concentrations <<- concentrations
+
+rates <-
+  data.table(reaction = paste0("k", 1:2))
+rates$k <- c(0.1,0.01)
+rates <<- rates
 
 ui <- dashboardPage(
   dashboardHeader(title = "REACTIONATOR", tags$li(
     class = "dropdown",
-    tags$a("v0.4.1", href = "https://github.com/brettljausn/reactionator/")
+    tags$a("v0.4.2", href = "https://github.com/brettljausn/reactionator/")
   )),
   dashboardSidebar(sidebarMenu(
     menuItem("Simulation",
@@ -124,6 +137,8 @@ ui <- dashboardPage(
 )
 
 server <- function(input, output) {
+  init <- "foo"
+  
   # create mail-link and output for ui
   email <-
     a("flx.lechleitner@gmail.com", href = "mailto:flx.lechleitner@gmail.com")
@@ -139,33 +154,91 @@ server <- function(input, output) {
       tagList("GitHub-Repository: ", github)
     })
   
+  # create stoichiometric matrix
   output$species_list <- renderRHandsontable({
-    stoic_matrix <- data.table(reaction = 1:input$number_reactions)
-    stoic_matrix[, as.character(LETTERS[1:input$number_species])] <-
-      as.numeric(0)
+    # add reaction
+    if (NROW(stoic_matrix) < input$number_reactions){
+      diff <- input$number_reactions - NROW(stoic_matrix)
+      to_add <- data.frame(reaction = (NROW(stoic_matrix)+1):(NROW(stoic_matrix)+diff))
+      to_add[,names(stoic_matrix)[-1]] <- 0
+      stoic_matrix <<- rbind(stoic_matrix, to_add)
+    }
+    
+    # remove reaction
+    if (NROW(stoic_matrix) > input$number_reactions){
+      stoic_matrix <<- stoic_matrix[1:input$number_reactions,]
+      stoic_matrix[, 2:NCOL(stoic_matrix)] <<- sapply(stoic_matrix[, 2:NCOL(stoic_matrix)], as.numeric)
+    }
+    
+    # remove species
+    if (NCOL(stoic_matrix) > (input$number_species+1)){
+      stoic_matrix <<- stoic_matrix[,1:(input$number_species+1)]
+      stoic_matrix[, 2:NCOL(stoic_matrix)] <<- sapply(stoic_matrix[, 2:NCOL(stoic_matrix)], as.numeric)
+    }
+    
+    # add species
+    if (NCOL(stoic_matrix) < (input$number_species+1)){
+      diff <-  input$number_species - NCOL(stoic_matrix)
+      to_add <- data.frame()
+      to_add[1:NROW(stoic_matrix),LETTERS[NCOL(stoic_matrix)]] <- 0
+      if (diff > 1){
+        to_add[LETTERS[NCOL(stoic_matrix):(NCOL(stoic_matrix)+(diff-1))]]
+      }
+      stoic_matrix <<- cbind(stoic_matrix, to_add)
+    }
+    
     rhandsontable(stoic_matrix, rowHeaders = NULL) %>% hot_col("reaction", readOnly = TRUE)
+  })
+  
+  observeEvent(input$species_list,{
+    stoic_matrix <<- hot_to_r(input$species_list)
+  })
+  
+  observeEvent(input$concentrations,{
+    concentrations <<- hot_to_r(input$concentrations)
   })
   
   # generate concentrations table
   output$concentrations <- renderRHandsontable({
-    req(input$species_list)
-    concentrations <-
-      data.table(species = paste0("c(", colnames(hot_to_r(
-        input$species_list
-      ))[2:NCOL(hot_to_r(input$species_list))], ")"))
-    concentrations$c <- 0
+    req(input$number_species)
+    
+    # add concentrations
+    if(input$number_species > NROW(concentrations)){
+      new_concentrations <- colnames(stoic_matrix)[(NROW(concentrations)+2):NCOL(stoic_matrix)]
+      new_concentrations <- paste0("c(", new_concentrations,")")
+      to_add <- data.frame(species = new_concentrations, c = 0, stringsAsFactors = F)
+      concentrations <<- rbind(concentrations, to_add)
+    }
+    
+    # remove concentrations
+    if(input$number_species < NROW(concentrations)){
+      concentrations <<- concentrations[1:(NCOL(stoic_matrix)-1)]
+    }
+
     rhandsontable(concentrations,
                   rowHeaders = NULL,
-                  colHeaders = NULL)
+                  colHeaders = NULL,
+                  viewportColumnRenderingOffset = 10) %>%  hot_col(1, readOnly = TRUE)
   })
   
   # generate reaction rates table
   output$reaction_rates <- renderRHandsontable({
     req(input$number_reactions)
-    rates <-
-      data.table(reaction = paste0("k", 1:input$number_reactions))
-    rates$k <- 0
-    rhandsontable(rates, rowHeaders = NULL, colHeaders = NULL)
+    
+    # remove reaction rates
+    if(input$number_reactions < NROW(rates)){
+      rates <<- rates[1:input$number_reactions]
+    }
+    
+    # add reaction rates
+    if(input$number_reactions > NROW(rates)){
+      diff <- input$number_reactions - NROW(rates)
+      to_add <-
+        data.table(reaction = paste0("k", (NROW(rates)+1):(NROW(rates)+(diff))), k = 0)
+      rates <<- rbind(rates,to_add)
+    }
+    
+    rhandsontable(rates, rowHeaders = NULL, colHeaders = NULL, viewportColumnRenderingOffset = 10) %>% hot_col(1, readOnly = TRUE)
   })
   
   # parse stoichiometric matrix into equations
