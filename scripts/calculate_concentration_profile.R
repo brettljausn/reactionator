@@ -1,8 +1,8 @@
 # data for testing
 # concentrations <- data.table(species = c("c(A)","c(B)","c(C)"),
-#                              c = c(3,2,0))
+#                              c = c(2,1,0.5))
 # rates <- data.table(reaction = c("k1", "k2"),
-#                     k = c(0.1,0.1))
+#                     k = c(0.1,0.01))
 # stoich_matrix <- data.table(reaction = c(1,2),
 #                             A = c(-2,2),
 #                             B = c(-1,1),
@@ -66,7 +66,7 @@ for (i in 2:length(time)){
   }
   for (j in 2:NCOL(nu_lhs)){
     for(l in 1:NROW(nu_lhs)){
-      intermediate_dc <- (stoich_matrix[l,j] * rates$k[l] * prod(as.numeric(intermediate_concentrations[i-1,2:NCOL(intermediate_concentrations)])^as.numeric(nu_lhs[l,2:NCOL(nu_lhs)]))) * stepsize
+      intermediate_dc <- (stoich_matrix[l,j] * rates$k[l] * prod(as.numeric(intermediate_concentrations[i,2:NCOL(intermediate_concentrations)])^as.numeric(nu_lhs[l,2:NCOL(nu_lhs)]))) * stepsize
       concentrations[i,j] <- concentrations[i,j] + intermediate_dc
     }
   }
