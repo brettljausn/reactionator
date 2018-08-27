@@ -1,15 +1,15 @@
 # data for testing
-concentrations <- data.table(species = c("c(A)","c(B)","c(C)"),
-                             c = c(3,2,0))
-rates <- data.table(reaction = c("k1", "k2"),
-                    k = c(0.01,0.1))
-stoich_matrix <- data.table(reaction = c(1,2),
-                            A = c(-2,2),
-                            B = c(-1,1),
-                            C = c(2,-2))
-endtime = 2
-stepsize = 0.1
-algorithm = "euler"
+# concentrations <- data.table(species = c("c(A)","c(B)","c(C)"),
+#                              c = c(3,2,0))
+# rates <- data.table(reaction = c("k1", "k2"),
+#                     k = c(0.1,0.1))
+# stoich_matrix <- data.table(reaction = c(1,2),
+#                             A = c(-2,2),
+#                             B = c(-1,1),
+#                             C = c(2,-2))
+# endtime = 2
+# stepsize = 0.1
+# algorithm = "rk"
 
 calc_concentrations <- function(concentrations, rates, stoich_matrix, endtime, stepsize, algorithm){
 
@@ -57,16 +57,22 @@ for (i in 2:length(time)){
   for (j in 2:NCOL(nu_lhs)){
     concentrations[i,1] <- time[i]
     concentrations[i,j] <- concentrations[i-1,j]
+    abs_concentration_change <- 0
     for (k in 1:NROW(nu_lhs)){
       delta_c <- (stoich_matrix[k,j] * rates$k[k] * prod(as.numeric(concentrations[i-1,2:NCOL(concentrations)])^as.numeric(nu_lhs[k,2:NCOL(nu_lhs)]))) * stepsize/2
-      intermediate_concentrations[i,j] <- concentrations[i,j] + delta_c
+      abs_concentration_change <- abs_concentration_change + delta_c
     }
+    intermediate_concentrations[i,j] <- concentrations[i,j] + abs_concentration_change
+  }
+  for (j in 2:NCOL(nu_lhs)){
     for(l in 1:NROW(nu_lhs)){
       intermediate_dc <- (stoich_matrix[l,j] * rates$k[l] * prod(as.numeric(intermediate_concentrations[i-1,2:NCOL(intermediate_concentrations)])^as.numeric(nu_lhs[l,2:NCOL(nu_lhs)]))) * stepsize
       concentrations[i,j] <- concentrations[i,j] + intermediate_dc
     }
   }
 }
+
+
 
 result_rk <- melt(concentrations, id.vars = "t")
 result_rk$variable <- sub("\\.", "(", result_rk$variable)
