@@ -14,67 +14,21 @@
 
 # REACTIONATOR
 
-One Paragraph of project description goes here
-
+This is a Shiny-Webapp written in R for simulating complex chemical reaction networks.
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+Download the repository and run _app.R_.
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
+   * R  
+   you can download it from https://www.r-project.org/. Version 3.4.2 has been used for developement, though it will most likely work with newer and older versions.
 
-```
-Give examples
-```
-
-### Installing
-
-A step by step series of examples that tell you how to get a development env running
-
-Say what the step will be
-
-```
-Give the example
-```
-
-And repeat
-
-```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo
-
-## Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
 
 ## Built With
 
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
+* [RStudio](https://www.rstudio.com/) - The used IDE
+
 
 ## Contributing
 
@@ -82,11 +36,11 @@ Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c6
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+We use a [SemVer](http://semver.org/)-approach for versioning. The app does not have APIs which can change, so I decided to increment the major version when there are major GUI-changes. 
 
 ## Authors
 
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
+* **Felix Lechleitner** - *Initial work* - [brettljausn](https://github.com/Brettljausn) - [personal webiste](www.felixlechleitner.com)
 
 See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
 
@@ -96,7 +50,5 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Acknowledgments
 
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
+* Special thanks to Dr. Werner Stadlmayr for the inspiration for this project
 
