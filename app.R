@@ -35,7 +35,7 @@ rates <<- rates
 ui <- dashboardPage(
   dashboardHeader(title = "REACTIONATOR", tags$li(
     class = "dropdown",
-    tags$a("v0.5.2", href = "https://github.com/brettljausn/reactionator/")
+    tags$a("v0.5.3", href = "https://github.com/brettljausn/reactionator/")
   )),
   dashboardSidebar(sidebarMenu(
     menuItem("Simulation",
@@ -96,7 +96,7 @@ ui <- dashboardPage(
                   ),
                   rHandsontableOutput("species_list"),
                   htmlOutput("chem_equations")
-                ),
+                ),column(width = 12,
                 box(
                   title = "Concentrations",
                   solidHeader = TRUE,
@@ -108,7 +108,7 @@ ui <- dashboardPage(
                   solidHeader = TRUE,
                   status = "primary",
                   rHandsontableOutput("reaction_rates")
-                ),
+                )),column(width = 12,
                 box(title = "Algorithms",
                     solidHeader = TRUE,
                     status = "primary",
@@ -128,7 +128,7 @@ ui <- dashboardPage(
                                  "stepsize:",
                                  0.1)
                   )
-                )
+                ))
               ), column(
                 width = 7,
                 box(
