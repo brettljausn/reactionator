@@ -35,7 +35,7 @@ rates <<- rates
 ui <- dashboardPage(
   dashboardHeader(title = "REACTIONATOR", tags$li(
     class = "dropdown",
-    tags$a("v0.5.1", href = "https://github.com/brettljausn/reactionator/")
+    tags$a("v0.5.2", href = "https://github.com/brettljausn/reactionator/")
   )),
   dashboardSidebar(sidebarMenu(
     menuItem("Simulation",
@@ -155,7 +155,7 @@ server <- function(input, output) {
   })
   
   # credit where credit is due
-  output$thanks <- renderText({"Special thanks to Dr. Werner Stadlmayr who inspired me to tackle this project."})
+  output$thanks <- renderText({"Special thanks to Dr. Werner Stadlmayr who inspired me to create this project."})
   
   # create github-link and output for ui
   github <-
