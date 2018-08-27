@@ -35,7 +35,7 @@ rates <<- rates
 ui <- dashboardPage(
   dashboardHeader(title = "REACTIONATOR", tags$li(
     class = "dropdown",
-    tags$a("v0.5.0", href = "https://github.com/brettljausn/reactionator/")
+    tags$a("v0.5.1", href = "https://github.com/brettljausn/reactionator/")
   )),
   dashboardSidebar(sidebarMenu(
     menuItem("Simulation",
@@ -64,6 +64,12 @@ ui <- dashboardPage(
               box(
                 title = "GitHub",
                 uiOutput("github"),
+                solidHeader = TRUE,
+                status = "primary"
+              ),
+              box(
+                title = "Thanks!",
+                textOutput("thanks"),
                 solidHeader = TRUE,
                 status = "primary"
               )
@@ -147,6 +153,9 @@ server <- function(input, output) {
   output$email <- renderUI({
     tagList(email)
   })
+  
+  # credit where credit is due
+  output$thanks <- renderText({"Special thanks to Dr. Werner Stadlmayr who inspired me to tackle this project."})
   
   # create github-link and output for ui
   github <-
