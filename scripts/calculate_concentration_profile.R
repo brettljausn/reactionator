@@ -7,10 +7,11 @@ stoich_matrix <- data.table(reaction = c(1,2),
                             A = c(-2,2),
                             B = c(-1,1),
                             C = c(2,-2))
-endtime = 1
+endtime = 2
 stepsize = 0.1
+algorithm = "euler"
 
-calc_concentrations <- function(concentrations, rates, stoich_matrix, endtime, stepsize){
+calc_concentrations <- function(concentrations, rates, stoich_matrix, endtime, stepsize, algorithm){
 
 time <- seq(0,endtime,stepsize)
 
@@ -28,8 +29,10 @@ for(i in 2:NCOL(nu_lhs)){
 }
 
 nu_lhs <- abs(nu_lhs)
+intermediate_concentrations <- concentrations
+aux <- concentrations
 
-
+if("euler" %in% algorithm){
 for (i in 2:length(time)){
   for (j in 2:NCOL(nu_lhs)){
     concentrations[i,1] <- time[i]
@@ -41,17 +44,51 @@ for (i in 2:length(time)){
   }
 }
 
-result <- melt(concentrations, id.vars = "t")
-result$variable <- sub("\\.", "(", result$variable)
-result$variable <- sub("\\.", ")", result$variable)
 
+result_euler <- melt(concentrations, id.vars = "t")
+result_euler$variable <- sub("\\.", "(", result_euler$variable)
+result_euler$variable <- sub("\\.", ")", result_euler$variable)
+result_euler$algorithm <- "Explicit Euler"
+}
 
-p <- ggplot(data = result, aes(x = t, y = value, color = variable)) +
+if("rk" %in% algorithm){
+concentrations <- aux
+for (i in 2:length(time)){
+  for (j in 2:NCOL(nu_lhs)){
+    concentrations[i,1] <- time[i]
+    concentrations[i,j] <- concentrations[i-1,j]
+    for (k in 1:NROW(nu_lhs)){
+      delta_c <- (stoich_matrix[k,j] * rates$k[k] * prod(as.numeric(concentrations[i-1,2:NCOL(concentrations)])^as.numeric(nu_lhs[k,2:NCOL(nu_lhs)]))) * stepsize/2
+      intermediate_concentrations[i,j] <- concentrations[i,j] + delta_c
+    }
+    for(l in 1:NROW(nu_lhs)){
+      intermediate_dc <- (stoich_matrix[l,j] * rates$k[l] * prod(as.numeric(intermediate_concentrations[i-1,2:NCOL(intermediate_concentrations)])^as.numeric(nu_lhs[l,2:NCOL(nu_lhs)]))) * stepsize
+      concentrations[i,j] <- concentrations[i,j] + intermediate_dc
+    }
+  }
+}
+
+result_rk <- melt(concentrations, id.vars = "t")
+result_rk$variable <- sub("\\.", "(", result_rk$variable)
+result_rk$variable <- sub("\\.", ")", result_rk$variable)
+result_rk$algorithm <- "2nd Order Runge-Kutta"
+}
+
+if(length(algorithm) == 2){
+result <- rbind(result_rk, result_euler)
+} else if(algorithm == "euler"){
+  result <- result_euler
+} else {
+  result <- result_rk
+}
+
+p <- ggplot(data = result, aes(x = t, y = value, color = variable, lty = algorithm)) +
   geom_line() +
   ylab(bquote('c / mol L'^-1)) +
   xlab("t / s") +
-  labs(color = "") +
-  theme_bw()
+  labs(color = "", lty = "Calculation Algorithm") +
+  theme_bw() +
+  ylim(0,NA)
 
 return(list(p,concentrations))
 }

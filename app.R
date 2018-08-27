@@ -35,7 +35,7 @@ rates <<- rates
 ui <- dashboardPage(
   dashboardHeader(title = "REACTIONATOR", tags$li(
     class = "dropdown",
-    tags$a("v0.4.2", href = "https://github.com/brettljausn/reactionator/")
+    tags$a("v0.5.0", href = "https://github.com/brettljausn/reactionator/")
   )),
   dashboardSidebar(sidebarMenu(
     menuItem("Simulation",
@@ -71,27 +71,22 @@ ui <- dashboardPage(
     tabItem(tabName = "simulation",
             fluidRow(
               column(
-                width = 4,
+                width = 5,
                 box(
                   title = "Stoichiometric matrix",
                   width = NULL,
                   solidHeader = TRUE,
                   status = "primary",
                   splitLayout(
-                    numericInput(
-                      "number_species",
-                      "Number of species:",
-                      3,
-                      min = 1,
-                      max = 24
-                    ),
-                    numericInput(
-                      "number_reactions",
-                      "Number of reactions:",
-                      2,
-                      min = 1,
-                      max = 10
-                    )
+                    # numericInput(
+                    #   "number_species",
+                    #   "Number of species:",
+                    #   3,
+                    #   min = 1,
+                    #   max = 24
+                    # ),
+                    sliderInput("number_species", "Number of species:", 1, 24, 3),
+                    sliderInput("number_reactions", "Number of reactions:", 1, 10, 2)
                   ),
                   rHandsontableOutput("species_list"),
                   htmlOutput("chem_equations")
@@ -108,6 +103,13 @@ ui <- dashboardPage(
                   status = "primary",
                   rHandsontableOutput("reaction_rates")
                 ),
+                box(title = "Algorithms",
+                    solidHeader = TRUE,
+                    status = "primary",
+                    checkboxGroupInput("algorithm", "Calculation algorithm used:",
+                                       c("Explicit Euler" = "euler",
+                                         "2nd Order Runge-Kutta" = "rk"),
+                                       selected = "euler")),
                 box(
                   title = "Time",
                   solidHeader = TRUE,
@@ -122,7 +124,7 @@ ui <- dashboardPage(
                   )
                 )
               ), column(
-                width = 8,
+                width = 7,
                 box(
                   title = "Results",
                   solidHeader = TRUE,
@@ -256,14 +258,16 @@ server <- function(input, output) {
         input$concentrations,
         input$reaction_rates,
         input$endtime,
-        input$stepsize
+        input$stepsize,
+        input$algorithm
       )
       calc_concentrations(
         hot_to_r(input$concentrations),
         hot_to_r(input$reaction_rates),
         hot_to_r(input$species_list),
         input$endtime,
-        input$stepsize
+        input$stepsize,
+        input$algorithm
       )[[1]]
     })
   
@@ -278,7 +282,8 @@ server <- function(input, output) {
           hot_to_r(input$reaction_rates),
           hot_to_r(input$species_list),
           input$endtime,
-          input$stepsize
+          input$stepsize,
+          input$algorithm
         )[[2]],
         file
       )
