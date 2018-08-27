@@ -32,7 +32,7 @@ Download the repository and run _app.R_.
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](https://github.com/brettljausn/reactionator/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+Please read [CONTRIBUTING.md](https://github.com/brettljausn/reactionator/blob/master/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## Versioning
 
@@ -46,7 +46,7 @@ See also the list of [contributors](https://github.com/brettljausn/reactionator/
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](https://github.com/brettljausn/reactionator/LICENSE.md) file for details
+This project is licensed under the MIT License - see the [LICENSE.md](https://github.com/brettljausn/reactionator/blob/master/LICENSE) file for details
 
 ## Acknowledgments
 
